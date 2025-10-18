@@ -299,7 +299,7 @@ This project is open source and available under the [MIT License](LICENSE).
 ## 👨‍💻 Author
 
 **Michael Fonate**
-- GitHub: [Your GitHub Profile]
+- GitHub: [Fonate-Michael](https://github.com/Fonate-Michael)
 
 ## 🙏 Acknowledgments
 
