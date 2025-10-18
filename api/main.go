@@ -8,7 +8,21 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
+	"golang.org/x/time/rate"
 )
+
+var limiter = rate.NewLimiter(10, 20)
+
+func rateLimiterMiddleware() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		if !limiter.Allow() {
+			ctx.JSON(429, gin.H{"error": "Too many requests"})
+			ctx.Abort()
+			return
+		}
+		ctx.Next()
+	}
+}
 
 func main() {
 	fmt.Println("Reverse Proxy started and ready to foward the requests hehehe!")
@@ -24,6 +38,7 @@ func main() {
 	Service_Three := os.Getenv("SERVICE_THREE")
 
 	router := gin.Default()
+	router.Use(rateLimiterMiddleware())
 	router.Any("/api1/*path", proxy.ReverseProxy(Service_One, "/api1"))
 	router.Any("/api2/*path", proxy.ReverseProxy(Service_Two, "/api2"))
 	router.Any("/api3/*path", proxy.ReverseProxy(Service_Three, "/api3"))

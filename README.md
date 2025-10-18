@@ -5,6 +5,7 @@ A lightweight API Gateway built with Go and Gin framework that demonstrates a mi
 ## 🚀 Features
 
 - **Reverse Proxy**: Routes requests to multiple backend services
+- **Rate Limiting**: Built-in rate limiter to prevent abuse (10 req/sec with 20 burst)
 - **Environment-based Configuration**: Easy service URL management via `.env` file
 - **Microservices Architecture**: Demonstrates service separation and communication
 - **Lightweight**: Built with minimal dependencies using Go and Gin
@@ -44,6 +45,7 @@ A lightweight API Gateway built with Go and Gin framework that demonstrates a mi
 - **Language**: Go 1.25.3
 - **Framework**: Gin Web Framework
 - **Environment Management**: godotenv
+- **Rate Limiting**: golang.org/x/time/rate
 - **Reverse Proxy**: Go's built-in `httputil.NewSingleHostReverseProxy`
 
 ## 📋 Prerequisites
@@ -241,6 +243,29 @@ Service One Response: {"message": "Service One"}
 
 Client receives: {"message": "Service One"}
 ```
+
+## ⚡ Rate Limiting
+
+The API Gateway includes a built-in rate limiter to protect against abuse and ensure fair usage. It uses Go's `golang.org/x/time/rate` package with a token bucket algorithm.
+
+- **Configuration**: Allows 10 requests per second with a burst capacity of 20 requests.
+- **Behavior**: Excess requests receive a 429 (Too Many Requests) status code.
+- **Implementation**: Applied globally via middleware in `main.go` for all routes.
+- **Customization**: Adjust the rate and burst in `var limiter = rate.NewLimiter(10, 20)` as needed.
+
+### Testing Rate Limiting
+
+Use `hey` (install via `go install github.com/rakyll/hey@latest`) to load test:
+
+```bash
+hey -n 25 -c 1 http://localhost:8000/api1/test
+```
+
+- The first 20 requests should succeed (200 status); the rest should return 429.
+
+![Load Testing Screenshot](./screenshot/load_testing.png)
+
+*Screenshot showing `hey` output with rate limiting in effect (429 responses for excess requests)*
 
 ## 🚦 Development
 
